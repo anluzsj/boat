@@ -84,7 +84,7 @@ class GemBuilder {
         m_gemList[gridIndex] = item
         item.setGridX(m_baseXIndex)
         item.setGridY(gridIndex)
-        item.setParentGemBuilder(this)
+        item.setParent(this, m_gemMatrix)
     }
 
     public function isItemReachButtom(item:Item):Boolean
@@ -99,9 +99,6 @@ class GemBuilder {
 
     public function getRandomTypeIndexExcept(excludeType1:Number, excludeType2:Number)
     {
-        trace("getRandomTypeIndexExcept")
-        trace("excludeType1 " + excludeType1)
-        trace("excludeType2 " + excludeType2)
         if(excludeType1 != null and excludeType2 != null)
         {
             var tempArray = new Array()
@@ -153,15 +150,13 @@ class GemBuilder {
         {
             var topItem1 = m_gemList[gridY - 1]
             var topItem2 = m_gemList[gridY - 2]
-            if(leftItem1.getItemType() == leftItem2.getItemType())
+            if(topItem1.getItemType() == topItem2.getItemType())
             {
                 excludeType2 = GemPool.getIndexFromTypeName(topItem1.getItemType())
             }
         }
         var randomIndex = getRandomTypeIndexExcept(excludeType1, excludeType2)
         var itemType = GemPool.getTypeNameFromIndex(randomIndex)
-        trace(randomIndex)
-        trace(itemType)
         return itemType
     }
 
@@ -176,7 +171,7 @@ class GemBuilder {
             gem._y = m_baseYPos + i * Item.GemHeight
             gem.setGridX(m_baseXIndex)
             gem.setGridY(i)
-            gem.setParentGemBuilder(this)
+            gem.setParent(this,m_gemMatrix)
             m_gemList[i] = gem
         }
     }
@@ -191,7 +186,7 @@ class GemBuilder {
         gem._y = m_baseYPos - Item.GemHeight
         gem.setGridX(m_baseXIndex)
         gem.setGridY(0)
-        gem.setParentGemBuilder(this)
+        gem.setParent(this,m_gemMatrix)
         m_gemList[0] = gem
 //        trace("genANewItem")
 //        trace("y" + gem._y)

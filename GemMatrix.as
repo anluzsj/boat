@@ -2,6 +2,7 @@ import Item;
 import GemPool;
 import GemBuilder;
 import SwapHandle;
+import Patterns;
 
 class GemMatrix{
     public var m_gemPool:GemPool;
@@ -29,6 +30,14 @@ class GemMatrix{
             m_gemBuilderList[i] = new GemBuilder(m_gemPool, this, i*Item.GemWidth, 0, i, maxGridY)
         }
         recreateMatrix()
+    }
+
+    public function tryToFindComboPattern(item:Item)
+    {
+        var verticalPattern = Patterns.tryToFindAValidPattern(Patterns.TRIGGERED_BY_COMBO, Patterns.LAYOUT_VERTICAL_5, item)
+        var horizontalPattern = Patterns.tryToFindAValidPattern(Patterns.TRIGGERED_BY_COMBO, Patterns.LAYOUT_HORIZONTAL_5, item)
+
+        return verticalPattern or horizontalPattern
     }
 
     public function recreateMatrix()

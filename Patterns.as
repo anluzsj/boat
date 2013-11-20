@@ -1,5 +1,4 @@
 import Item
-import GemMatrix
 import ItemBehavior
 import PrefebPatterns;
 import PatternPool;
@@ -10,8 +9,21 @@ class Patterns
     public var m_items:Array;
     public var m_layoutType;
     public var m_patternType;
+    public var m_triggerType;
     static public var LAYOUT_VERTICAL_5     = 1
     static public var LAYOUT_HORIZONTAL_5   = 2
+    static public var TRIGGERED_BY_SWAP     = 1
+    static public var TRIGGERED_BY_COMBO    = 2
+
+    public function setTriggerType(triggerType:Number)
+    {
+        m_triggerType = triggerType
+    }
+
+    public function isCombo()
+    {
+        return m_triggerType == TRIGGERED_BY_COMBO
+    }
 
     public function Patterns()
     {
@@ -35,31 +47,74 @@ class Patterns
         m_patterns[4] = ItemBehavior.NONE
 
         m_patternType = PrefebPatterns.PT_INVALID
+        m_triggerType = TRIGGERED_BY_SWAP
     }
+
     public function isValid():Boolean
     {
         return m_patternType != PrefebPatterns.PT_INVALID
     }
-    public function fire()
+
+    public function releaseThis()
     {
-        trace("Patterns.fire")
-        var len = m_items.length
-        for(var i=0; i<len ; ++i)
-        {
-            var item = m_items[i]
-            if(item and m_patterns[i] == ItemBehavior.SAME)
-            {
-                item.playAnim("destroy")
-            }
-        }
         reset()
         PatternPool.releaseAPattern(this)
     }
 
+    public function fire()
+    {
+        trace("Patterns.fire")
+        showDebugInfo()
+        var len = m_items.length
+        for(var i=0; i<len ; ++i)
+        {
+            var item = m_items[i]
+            if(item)
+            {
+                item.playAnim("destroy")
+            }
+        }
+        releaseThis()
+    }
+
     public function setPatternType(patternType:Number)
     {
+        if(m_patternType == patternType)
+        {
+            return
+        }
+
         trace("setPatternType " + patternType)
         m_patternType = patternType
+        if(m_patternType != PrefebPatterns.PT_INVALID)
+        {
+            if(m_items[0] == null and m_items[1] == null)
+            {
+                m_items[0] = m_items[2]
+                m_items[1] = m_items[3]
+                m_items[2] = m_items[4]
+                m_items[3] = null
+                m_items[4] = null
+                m_patterns[0] = m_patterns[2]
+                m_patterns[1] = m_patterns[3]
+                m_patterns[2] = m_patterns[4]
+                m_patterns[3] = ItemBehavior.NONE
+                m_patterns[4] = ItemBehavior.NONE
+            }
+            else if(m_items[0] == null)
+            {
+                m_items[0] = m_items[1]
+                m_items[1] = m_items[2]
+                m_items[2] = m_items[3]
+                m_items[3] = m_items[4]
+                m_items[4] = null
+                m_patterns[0] = m_patterns[1]
+                m_patterns[1] = m_patterns[2]
+                m_patterns[2] = m_patterns[3]
+                m_patterns[3] = m_patterns[4]
+                m_patterns[4] = ItemBehavior.NONE
+            }
+        }
     }
 
     public function checkFire()
@@ -100,16 +155,10 @@ class Patterns
         trace("patterns: " + m_patterns[0] + " " + m_patterns[1] + " " + m_patterns[2] + "  " + m_patterns[3] + "  " + m_patterns[4] )
         trace("m_patternType " + m_patternType)
     }
-    public function rePattern()
+
+    public function checkIsValid()
     {
-        trace("rePattern " + m_items[0])
-        m_patterns[0] = ItemBehavior.getItemPatternType(m_items[0], m_items[2])
-        m_patterns[1] = ItemBehavior.getItemPatternType(m_items[1], m_items[2])
-        m_patterns[2] = ItemBehavior.getItemPatternType(m_items[2], m_items[2])
-        m_patterns[3] = ItemBehavior.getItemPatternType(m_items[3], m_items[2])
-        m_patterns[4] = ItemBehavior.getItemPatternType(m_items[4], m_items[2])
-        PrefebPatterns.checkPattern(this)
-        showDebugInfo()
+        rePattern()
         if(m_patternType != PrefebPatterns.PT_INVALID)
         {
             var len = m_items.length
@@ -122,12 +171,45 @@ class Patterns
                 }
             }
         }
+        else
+        {
+            releaseThis()
+        }
     }
 
-    public function constructPattern(layoutType:Number, gemMatrix:GemMatrix, centerGridX, centerGridY, centerItem:Item)
+    public function rePattern()
+    {
+//        trace("rePattern " + m_items[0])
+        m_patterns[0] = ItemBehavior.getItemPatternType(m_items[0], m_items[2])
+        m_patterns[1] = ItemBehavior.getItemPatternType(m_items[1], m_items[2])
+        m_patterns[2] = ItemBehavior.getItemPatternType(m_items[2], m_items[2])
+        m_patterns[3] = ItemBehavior.getItemPatternType(m_items[3], m_items[2])
+        m_patterns[4] = ItemBehavior.getItemPatternType(m_items[4], m_items[2])
+        PrefebPatterns.checkPattern(this)
+//      showDebugInfo()
+    }
+
+    static public function tryToFindAValidPattern(triggerType:Number, layoutType:Number, item:Item):Patterns
+    {
+        var pattern = PatternPool.getAPattern()
+        pattern.constructPattern(triggerType, layoutType, item.getGridX(), item.getGridY(), null)
+        pattern.checkIsValid()
+        if(pattern.isValid())
+        {
+            return pattern
+        }
+        else
+        {
+            return null
+        }
+    }
+
+    public function constructPattern(triggerType:Number,layoutType:Number, centerGridX, centerGridY, centerItem:Item)
     {
 //        trace("constructPattern " + centerGridX + "  " + centerGridY)
+        var gemMatrix = PatternPool.getGemMatrix()
         m_layoutType = layoutType
+        setTriggerType(triggerType)
         if(m_layoutType == Patterns.LAYOUT_VERTICAL_5)
         {
             m_items[0] = gemMatrix.getItem(centerGridX , centerGridY - 2)

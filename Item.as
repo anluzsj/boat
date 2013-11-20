@@ -2,6 +2,7 @@ import GemBuilder;
 import Patters;
 import PrefebPattern;
 import PatternPool;
+import GemMatrix;
 import MovieClip;
 class Item extends MovieClip {
 
@@ -15,6 +16,7 @@ class Item extends MovieClip {
     public var m_id;
     public var m_gemBuilder:GemBuilder;
     public var m_tag;
+    public var m_gemMatrix:GemMatrix    = null;
     static public var TAG_NONE          = 0;
     static public var TAG_DESTROY       = 1;
     static public var TAG_HIGHEST_DEPTH = 2;
@@ -25,7 +27,8 @@ class Item extends MovieClip {
     static public var GEM_STATUS_FALLING    = 3;
     static public var GEM_STATUS_DESTROY    = 4;
     public var m_currentStatus = Item.GEM_STATUS_IDLE
-
+    public var m_verticalPattern = null;
+    public var m_horizontalPattern = null;
     public function Item() {
         gotoAndStop("idle")
     }
@@ -39,6 +42,18 @@ class Item extends MovieClip {
         this._x = 0
         this._y = 0
         m_itemType = "none"
+        m_verticalPattern = null;
+        m_horizontalPattern = null;
+    }
+
+    public function isInVerticalPattern():Boolean
+    {
+        return m_verticalPattern != null;
+    }
+
+    public function isInHorizontalPattern():Boolean
+    {
+        return m_horizontalPattern != null;
     }
 
     public function setTag(tag:Number)
@@ -62,9 +77,10 @@ class Item extends MovieClip {
         return m_currentStatus;
     }
 
-    public function setParentGemBuilder(gemBuilder:GemBuilder)
+    public function setParent(gemBuilder:GemBuilder, gemMatrix:GemMatrix)
     {
-        m_gemBuilder = gemBuilder;
+        m_gemBuilder    = gemBuilder;
+        m_gemMatrix     = gemMatrix;
     }
 
     public function setID(id:Number)
@@ -107,7 +123,7 @@ class Item extends MovieClip {
                 }
             }
             var destYPos = m_gemBuilder.getBaseYPos() + getGridY() * Item.GemHeight
-            if(this._y <= destYPos)
+            if(this._y < destYPos)
             {
                 m_currentStatus = GEM_STATUS_FALLING
             }
@@ -116,8 +132,10 @@ class Item extends MovieClip {
 
     public function onFallingOver()
     {
-        var verticalPattern = PatternPool.getAPattern()
-        var horizontalPattern = PatternPool.getAPattern()
+        if(m_gemMatrix.tryToFindComboPattern(this))
+        {
+            trace("fuck combo")
+        }
     }
 
     public function update(dt)
@@ -130,7 +148,6 @@ class Item extends MovieClip {
         var gridPos = String(getGridX()) + getGridY()
         body["GridPos"].text = gridPos
         body["GridPos"]._visible = false    //zsj enable show gridIndex
-
         if(m_currentStatus == GEM_STATUS_SWAPING || m_currentStatus == GEM_STATUS_DESTROY  || m_tag == TAG_DESTROY)
         {
             return;

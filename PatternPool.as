@@ -5,12 +5,20 @@ class PatternPool
 {
     static public var m_freePatternList:Array
     static public var m_allPatternList:Array
+    static public var m_gemMatrix:GemMatrix;
+
     public function PatternPool()
     {
     }
 
-    static public function init(sz:Number)
+    static public function getGemMatrix()
     {
+        return m_gemMatrix;
+    }
+
+    static public function init(gemMatrix:GemMatrix, sz:Number)
+    {
+        m_gemMatrix = gemMatrix;
         m_freePatternList   = new Array()
         m_allPatternList    = new Array()
         for(var i=0; i<sz; ++i)
