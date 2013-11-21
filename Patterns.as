@@ -10,8 +10,8 @@ class Patterns
     public var m_layoutType;
     public var m_patternType;
     public var m_triggerType;
-    static public var LAYOUT_VERTICAL_5     = 1
-    static public var LAYOUT_HORIZONTAL_5   = 2
+    static public var LAYOUT_VERTICAL= 1
+    static public var LAYOUT_HORIZONTAL= 2
     static public var TRIGGERED_BY_SWAP     = 1
     static public var TRIGGERED_BY_COMBO    = 2
 
@@ -48,6 +48,11 @@ class Patterns
 
         m_patternType = PrefebPatterns.PT_INVALID
         m_triggerType = TRIGGERED_BY_SWAP
+    }
+
+    public function getLayout()
+    {
+        return m_layoutType
     }
 
     public function isValid():Boolean
@@ -167,7 +172,7 @@ class Patterns
                 var item = m_items[i]
                 if(item and m_patterns[i] == ItemBehavior.SAME)
                 {
-                    item.setTag(Item.TAG_DESTROY)
+                    item.setInPattern(this)
                 }
             }
         }
@@ -210,7 +215,7 @@ class Patterns
         var gemMatrix = PatternPool.getGemMatrix()
         m_layoutType = layoutType
         setTriggerType(triggerType)
-        if(m_layoutType == Patterns.LAYOUT_VERTICAL_5)
+        if(m_layoutType == Patterns.LAYOUT_VERTICAL)
         {
             m_items[0] = gemMatrix.getItem(centerGridX , centerGridY - 2)
             m_items[1] = gemMatrix.getItem(centerGridX , centerGridY - 1)
@@ -218,7 +223,7 @@ class Patterns
             m_items[3] = gemMatrix.getItem(centerGridX , centerGridY + 1)
             m_items[4] = gemMatrix.getItem(centerGridX , centerGridY + 2)
         }
-        else if(m_layoutType == Patterns.LAYOUT_HORIZONTAL_5)
+        else if(m_layoutType == Patterns.LAYOUT_HORIZONTAL)
         {
             m_items[0] = gemMatrix.getItem(centerGridX - 2, centerGridY)
             m_items[1] = gemMatrix.getItem(centerGridX - 1, centerGridY)

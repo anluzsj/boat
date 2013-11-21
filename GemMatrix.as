@@ -34,8 +34,8 @@ class GemMatrix{
 
     public function tryToFindComboPattern(item:Item)
     {
-        var verticalPattern = Patterns.tryToFindAValidPattern(Patterns.TRIGGERED_BY_COMBO, Patterns.LAYOUT_VERTICAL_5, item)
-        var horizontalPattern = Patterns.tryToFindAValidPattern(Patterns.TRIGGERED_BY_COMBO, Patterns.LAYOUT_HORIZONTAL_5, item)
+        var verticalPattern = Patterns.tryToFindAValidPattern(Patterns.TRIGGERED_BY_COMBO, Patterns.LAYOUT_VERTICAL, item)
+        var horizontalPattern = Patterns.tryToFindAValidPattern(Patterns.TRIGGERED_BY_COMBO, Patterns.LAYOUT_HORIZONTAL, item)
 
         return verticalPattern or horizontalPattern
     }

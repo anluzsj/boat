@@ -1,5 +1,5 @@
 import GemBuilder;
-import Patters;
+import Patterns;
 import PrefebPattern;
 import PatternPool;
 import GemMatrix;
@@ -18,8 +18,7 @@ class Item extends MovieClip {
     public var m_tag;
     public var m_gemMatrix:GemMatrix    = null;
     static public var TAG_NONE          = 0;
-    static public var TAG_DESTROY       = 1;
-    static public var TAG_HIGHEST_DEPTH = 2;
+    static public var TAG_HIGHEST_DEPTH = 1;
 
     static public var GEM_STATUS_NONE       = 0;
     static public var GEM_STATUS_IDLE       = 1;
@@ -51,6 +50,18 @@ class Item extends MovieClip {
         return m_verticalPattern != null;
     }
 
+    public function setInPattern(pattern)
+    {
+        if(pattern.getLayout() == Patterns.LAYOUT_VERTICAL)
+        {
+            m_verticalPattern = pattern
+        }
+        else
+        {
+            m_horizontalPattern = pattern
+        }
+    }
+
     public function isInHorizontalPattern():Boolean
     {
         return m_horizontalPattern != null;
@@ -60,10 +71,6 @@ class Item extends MovieClip {
     {
         trace("setTag " + this._name + "  " + tag)
         m_tag = tag
-        if(m_tag == TAG_DESTROY)
-        {
-            m_currentStatus = GEM_STATUS_IDLE
-        }
     }
 
     public function setStatus(v:Number)
@@ -105,12 +112,8 @@ class Item extends MovieClip {
 
     public function checkNeedFalling()
     {
-        if(m_tag == Item.TAG_DESTROY)
-        {
-            return
-        }
 
-        //we should check when GEM_STATUS_FALLING, so the drop anim si smooth
+        //we should check when GEM_STATUS_FALLING, so the drop anim is not smooth
         if(m_currentStatus == GEM_STATUS_IDLE )
         {
             if(not m_gemBuilder.isItemReachButtom(this))
@@ -134,21 +137,20 @@ class Item extends MovieClip {
     {
         if(m_gemMatrix.tryToFindComboPattern(this))
         {
-            trace("fuck combo")
+
         }
     }
 
     public function update(dt)
     {
-        var body = this["Body"];
-        body["ColorForm"]._visible = false
-        checkNeedFalling()
         m_frameCounter ++;
-        var body = this["Body"]
+        var body = this["Body"];
+//        body["ColorForm"]._visible = false
+        checkNeedFalling()
         var gridPos = String(getGridX()) + getGridY()
         body["GridPos"].text = gridPos
         body["GridPos"]._visible = false    //zsj enable show gridIndex
-        if(m_currentStatus == GEM_STATUS_SWAPING || m_currentStatus == GEM_STATUS_DESTROY  || m_tag == TAG_DESTROY)
+        if(m_currentStatus == GEM_STATUS_SWAPING || m_currentStatus == GEM_STATUS_DESTROY  )
         {
             return;
         }
@@ -165,7 +167,7 @@ class Item extends MovieClip {
             }
 
             var destYPos = m_gemBuilder.getBaseYPos() + getGridY() * Item.GemHeight
-            if(Math.abs(destYPos - this._y) <= 5)
+            if(Math.abs(destYPos - this._y) <= 10)
             {
                 this._y = destYPos
                 m_currentStatus = GEM_STATUS_IDLE
@@ -173,7 +175,7 @@ class Item extends MovieClip {
             }
             else
             {
-                this._y += 5;
+                this._y += 10;
             }
         }
     }
