@@ -116,6 +116,7 @@ class GemMatrix{
             }
             else
             {
+                //if it's a invalid swap, change depth
                 m_secondItem.setTag(Item.TAG_HIGHEST_DEPTH)
             }
 
