@@ -12,6 +12,7 @@ class GemBuilder {
     public var m_gemList:Array;
     public var m_builderName:String;
     public var m_gemMatrix:GemMatrix;
+    public var m_lockCounter;
 
     public function GemBuilder(gemPool:GemPool, gemMatrix:GemMatrix, baseXPos:Number, baseYPos:Number, baseXIndex:Number, maxYIndex:Number)
     {
@@ -23,6 +24,29 @@ class GemBuilder {
         m_builderName = "Builder" + m_baseXIndex
         m_gemList = new Array();
         m_gemMatrix = gemMatrix;
+        m_lockCounter = 0;
+    }
+
+    public function getBuilderName()
+    {
+        return m_builderName
+    }
+
+    public function lockSwap()
+    {
+        m_lockCounter++;
+    }
+
+    public function unlockSwap()
+    {
+//        trace("unlockSwap " + m_builderName)
+        m_lockCounter--;
+//        trace("lockCounter " + m_lockCounter)
+    }
+
+    public function isLockedForSwap()
+    {
+        return m_lockCounter > 0
     }
 
     public function getBaseGridX(): Number
@@ -81,6 +105,7 @@ class GemBuilder {
 
     public function setItemToIndex(item:Item, gridIndex:Number)
     {
+//        trace("setItemToIndex " + item._name + "  " + gridIndex)
         m_gemList[gridIndex] = item
         item.setGridX(m_baseXIndex)
         item.setGridY(gridIndex)

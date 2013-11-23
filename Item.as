@@ -72,13 +72,13 @@ class Item extends MovieClip {
 
     public function setTag(tag:Number)
     {
-        trace("setTag " + this._name + "  " + tag)
+//        trace("setTag " + this._name + "  " + tag)
         m_tag = tag
     }
 
     public function setStatus(v:Number)
     {
-        trace("setStatus " + this._name + "  " + v)
+//      trace("setStatus " + this._name + "  " + v)
         m_currentStatus = v
     }
 
@@ -89,6 +89,7 @@ class Item extends MovieClip {
 
     public function setParent(gemBuilder:GemBuilder, gemMatrix:GemMatrix)
     {
+//        trace("setParent " + gemBuilder.getBuilderName())
         m_gemBuilder    = gemBuilder;
         m_gemMatrix     = gemMatrix;
     }
@@ -249,6 +250,7 @@ class Item extends MovieClip {
 
     public function onDestroyAnimOver()
     {
+        m_gemBuilder.unlockSwap()
         m_gemBuilder.removeItem(this)
     }
 
@@ -261,10 +263,11 @@ class Item extends MovieClip {
     {
         playAnim("destroy")
         setStatus(GEM_STATUS_DESTROY)
+        m_gemBuilder.lockSwap()
     }
 
     public function canSwap()
     {
-        return m_currentStatus == GEM_STATUS_IDLE
+        return m_currentStatus == GEM_STATUS_IDLE and not m_gemBuilder.isLockedForSwap() and not m_verticalPattern and not m_horizontalPattern
     }
 }
