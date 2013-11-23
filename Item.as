@@ -25,6 +25,9 @@ class Item extends MovieClip {
     static public var GEM_STATUS_SWAPING    = 2;
     static public var GEM_STATUS_FALLING    = 3;
     static public var GEM_STATUS_DESTROY    = 4;
+
+    static public var DESTROY_TYPE_NORMAL   = 1;
+
     public var m_currentStatus = Item.GEM_STATUS_IDLE
     public var m_verticalPattern = null;
     public var m_horizontalPattern = null;
@@ -252,5 +255,16 @@ class Item extends MovieClip {
     public function playAnim(anim:String)
     {
         gotoAndPlay(anim)
+    }
+
+    public function setDestroy(destroyType)
+    {
+        playAnim("destroy")
+        setStatus(GEM_STATUS_DESTROY)
+    }
+
+    public function canSwap()
+    {
+        return m_currentStatus == GEM_STATUS_IDLE
     }
 }

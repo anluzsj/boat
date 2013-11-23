@@ -103,7 +103,7 @@ class GemMatrix{
 
     public function triggerSwapItem()
     {
-        if(m_firstItem and m_secondItem)
+        if(m_firstItem and m_secondItem and m_firstItem.canSwap() and m_secondItem.canSwap())
         {
             var isValidSwap = SwapHandle.trySwap(m_firstItem, m_secondItem)
             m_firstItem.swapDepths(m_firstItem._parent.getNextHighestDepth())

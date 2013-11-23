@@ -76,7 +76,7 @@ class Patterns
             var item = m_items[i]
             if(item)
             {
-                item.playAnim("destroy")
+                item.setDestroy(Item.DESTROY_TYPE_NORMAL)
             }
         }
         releaseThis()
