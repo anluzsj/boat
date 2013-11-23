@@ -210,28 +210,24 @@ class Item extends MovieClip {
 
     public function onReachRight()
     {
-        trace(this._name + " onReachRight")
         this._x += GemWidth;
         onMoveAnimOver()
     }
 
     public function onReachLeft()
     {
-        trace(this._name + " onReachLeft")
         this._x -= GemWidth;
         onMoveAnimOver()
     }
 
     public function onReachButtom()
     {
-        trace(this._name + " onReachButtom")
         this._y += GemHeight;
         onMoveAnimOver()
     }
 
     public function onReachTop()
     {
-        trace(this._name + " onReachTop")
         this._y -= GemHeight;
         onMoveAnimOver()
     }
@@ -239,14 +235,12 @@ class Item extends MovieClip {
     {
         if(m_tag == TAG_HIGHEST_DEPTH)
         {
-            trace("onRollAnimHalfOver")
-            swapDepths(this._parent.getNextHighestDepth())
+            this.swapDepths(this._parent.getNextHighestDepth())
             m_tag = TAG_NONE
         }
     }
     public function onRollAnimOver()
     {
-        trace("onRollAnimOver")
         m_currentStatus = GEM_STATUS_IDLE
     }
 

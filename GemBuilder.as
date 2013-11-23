@@ -76,7 +76,7 @@ class GemBuilder {
             }
         }
         m_gemList[0] = null
-        m_gemPool.releaseItem(item)
+        m_gemPool.releaseGem(item)
     }
 
     public function setItemToIndex(item:Item, gridIndex:Number)
