@@ -139,10 +139,7 @@ class Item extends MovieClip {
 
     public function onFallingOver()
     {
-        if(m_gemMatrix.tryToFindComboPattern(this))
-        {
-
-        }
+        m_gemMatrix.tryToFindComboPattern(this)
     }
 
     public function update(dt)
@@ -264,6 +261,22 @@ class Item extends MovieClip {
         playAnim("destroy")
         setStatus(GEM_STATUS_DESTROY)
         m_gemBuilder.lockSwap()
+    }
+
+    public function canBeUsedInPattern(layoutType:Number)
+    {
+        if(m_currentStatus == GEM_STATUS_IDLE)
+        {
+            if(layoutType == Patterns.LAYOUT_VERTICAL)
+            {
+                return m_verticalPattern == null
+            }
+            else
+            {
+                return m_horizontalPattern == null
+            }
+        }
+        return false
     }
 
     public function canSwap()

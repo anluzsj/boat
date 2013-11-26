@@ -10,6 +10,7 @@ class Patterns
     public var m_layoutType;
     public var m_patternType;
     public var m_triggerType;
+    public var m_index;
     static public var LAYOUT_VERTICAL= 1
     static public var LAYOUT_HORIZONTAL= 2
     static public var TRIGGERED_BY_SWAP     = 1
@@ -25,10 +26,16 @@ class Patterns
         return m_triggerType == TRIGGERED_BY_COMBO
     }
 
-    public function Patterns()
+    public function getName()
+    {
+        return "Patterns_" + m_index
+    }
+
+    public function Patterns(idx:Number)
     {
         m_patterns  = new Array()
         m_items     = new Array()
+        m_index     = idx
         reset()
     }
 
@@ -156,9 +163,12 @@ class Patterns
     }
     public function showDebugInfo()
     {
+        trace("pattern info ==========")
+        trace(getName())
         trace("itemTypes: " + m_items[0].getItemType() + " " + m_items[1].getItemType() + " " + m_items[2].getItemType() + "  " + m_items[3].getItemType() + "  " + m_items[4].getItemType() )
         trace("patterns: " + m_patterns[0] + " " + m_patterns[1] + " " + m_patterns[2] + "  " + m_patterns[3] + "  " + m_patterns[4] )
         trace("m_patternType " + m_patternType)
+        trace("======================")
     }
 
     public function checkIsValid()
@@ -184,14 +194,17 @@ class Patterns
 
     public function rePattern()
     {
-//        trace("rePattern " + m_items[0])
-        m_patterns[0] = ItemBehavior.getItemPatternType(m_items[0], m_items[2])
-        m_patterns[1] = ItemBehavior.getItemPatternType(m_items[1], m_items[2])
-        m_patterns[2] = ItemBehavior.getItemPatternType(m_items[2], m_items[2])
-        m_patterns[3] = ItemBehavior.getItemPatternType(m_items[3], m_items[2])
-        m_patterns[4] = ItemBehavior.getItemPatternType(m_items[4], m_items[2])
+        m_patterns[0] = ItemBehavior.getItemPatternType(this, m_items[0], m_items[2])
+        m_patterns[1] = ItemBehavior.getItemPatternType(this, m_items[1], m_items[2])
+        m_patterns[2] = ItemBehavior.getItemPatternType(this, m_items[2], m_items[2])
+        m_patterns[3] = ItemBehavior.getItemPatternType(this, m_items[3], m_items[2])
+        m_patterns[4] = ItemBehavior.getItemPatternType(this, m_items[4], m_items[2])
         PrefebPatterns.checkPattern(this)
-//      showDebugInfo()
+        if(m_patternType != PrefebPatterns.PT_INVALID)
+        {
+            trace("find a valid pattern")
+            showDebugInfo()
+        }
     }
 
     static public function tryToFindAValidPattern(triggerType:Number, layoutType:Number, item:Item):Patterns

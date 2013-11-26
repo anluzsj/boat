@@ -33,7 +33,7 @@ class GemPool{
         m_gemTypeDef[2] = "red";
         m_gemTypeDef[3] = "yellow";
         m_gemTypeDef[4] = "gray";
-        m_gemTypeDef[5] = "pink";
+//        m_gemTypeDef[5] = "pink";
     }
     static public function getAllGemTypeSize():Number
     {

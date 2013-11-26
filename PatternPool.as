@@ -6,6 +6,7 @@ class PatternPool
     static public var m_freePatternList:Array
     static public var m_allPatternList:Array
     static public var m_gemMatrix:GemMatrix;
+    static private var m_nextValidIndex;
 
     public function PatternPool()
     {
@@ -21,9 +22,10 @@ class PatternPool
         m_gemMatrix = gemMatrix;
         m_freePatternList   = new Array()
         m_allPatternList    = new Array()
+        m_nextValidIndex    = 1
         for(var i=0; i<sz; ++i)
         {
-            var pattern = new Patterns();
+            var pattern = new Patterns(m_nextValidIndex++);
             m_freePatternList.push(pattern)
             m_allPatternList.push(pattern)
         }
@@ -43,7 +45,7 @@ class PatternPool
         {
             for(var i=0; i<3; ++i)
             {
-                var pattern = new Patterns();
+                var pattern = new Patterns(m_nextValidIndex++);
                 m_freePatternList.push(pattern)
                 m_allPatternList.push(pattern)
             }
