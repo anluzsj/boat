@@ -11,6 +11,7 @@ class Patterns
     public var m_patternType;
     public var m_triggerType;
     public var m_index;
+    public var m_keyItem;
     static public var LAYOUT_VERTICAL= 1
     static public var LAYOUT_HORIZONTAL= 2
     static public var TRIGGERED_BY_SWAP     = 1
@@ -57,9 +58,19 @@ class Patterns
         m_triggerType = TRIGGERED_BY_SWAP
     }
 
+    public function getKeyItem()
+    {
+        return m_keyItem
+    }
+
     public function getLayout()
     {
         return m_layoutType
+    }
+
+    public function getPatternType()
+    {
+        return m_patternType
     }
 
     public function isValid():Boolean
@@ -83,7 +94,7 @@ class Patterns
             var item = m_items[i]
             if(item)
             {
-                item.setDestroy(Item.DESTROY_TYPE_NORMAL)
+                item.fire()
             }
         }
         releaseThis()
@@ -135,7 +146,7 @@ class Patterns
         for(var i=0; i<len ; ++i)
         {
             var item = m_items[i]
-            if(item and item.getItemStatus() != Item.GEM_STATUS_IDLE)
+            if(item and not item.canFire())
             {
                 return
             }
@@ -165,6 +176,7 @@ class Patterns
     {
         trace("pattern info ==========")
         trace(getName())
+        trace("layoutType " + m_layoutType)
         trace("itemTypes: " + m_items[0].getItemType() + " " + m_items[1].getItemType() + " " + m_items[2].getItemType() + "  " + m_items[3].getItemType() + "  " + m_items[4].getItemType() )
         trace("patterns: " + m_patterns[0] + " " + m_patterns[1] + " " + m_patterns[2] + "  " + m_patterns[3] + "  " + m_patterns[4] )
         trace("m_patternType " + m_patternType)
@@ -248,6 +260,7 @@ class Patterns
         {
             m_items[2] = centerItem
         }
+        m_keyItem = m_items[2]
     }
 
     public function swapItem(item1:Item, item2:Item)

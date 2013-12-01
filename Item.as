@@ -1,6 +1,6 @@
 import GemBuilder;
 import Patterns;
-import PrefebPattern;
+import PrefebPatterns;
 import PatternPool;
 import GemMatrix;
 import MovieClip;
@@ -9,6 +9,8 @@ class Item extends MovieClip {
     static public var GemWidth = 50;
     static public var GemHeight = 50;
 
+    public var m_currentInnerType:Number;
+    public var m_nextInnerType:Number;
     public var m_itemType:String;
     public var m_gridX:Number;
     public var m_frameCounter:Number;
@@ -20,23 +22,35 @@ class Item extends MovieClip {
     static public var TAG_NONE          = 0;
     static public var TAG_HIGHEST_DEPTH = 1;
 
+    static public var GEM_INNER_TYPE_NORMAL     = 1;
+    static public var GEM_INNER_TYPE_HORIZONTAL = 2;
+    static public var GEM_INNER_TYPE_VERTICAL   = 3;
+    static public var GEM_INNER_TYPE_BLOCK      = 4;
+    static public var GEM_INNER_TYPE_CROSS      = 5;
+    static public var GEM_INNER_TYPE_SUPER      = 6;
+
     static public var GEM_STATUS_NONE       = 0;
     static public var GEM_STATUS_IDLE       = 1;
     static public var GEM_STATUS_SWAPING    = 2;
     static public var GEM_STATUS_FALLING    = 3;
     static public var GEM_STATUS_DESTROY    = 4;
+    static public var GEM_STATUS_REBORN     = 5;
 
     static public var DESTROY_TYPE_NORMAL   = 1;
 
     public var m_currentStatus = Item.GEM_STATUS_IDLE
     public var m_verticalPattern = null;
     public var m_horizontalPattern = null;
+
     public function Item() {
         gotoAndStop("idle")
     }
+
     public function reset()
     {
         m_tag = TAG_NONE
+        m_currentInnerType  = GEM_INNER_TYPE_NORMAL
+        m_nextInnerType     = GEM_INNER_TYPE_NORMAL
         m_currentStatus = GEM_STATUS_IDLE
         m_frameCounter = 0
         m_gridX = -1
@@ -62,6 +76,26 @@ class Item extends MovieClip {
         else
         {
             m_horizontalPattern = pattern
+        }
+
+        if((m_verticalPattern and m_verticalPattern.getPatternType() == PrefebPatterns.PT_FIVE and m_verticalPattern.getKeyItem() == this) or (m_horizontalPattern and m_horizontalPattern.getPatternType() == PrefebPatterns.PT_FIVE and m_horizontalPattern.getKeyItem() == this))
+        {
+            m_nextInnerType = GEM_INNER_TYPE_SUPER
+        }
+        else if(m_verticalPattern and m_verticalPattern.getPatternType() == PrefebPatterns.PT_FOUR and m_verticalPattern.getKeyItem() == this)
+        {
+            m_nextInnerType = GEM_INNER_TYPE_VERTICAL
+        }
+        else if(m_horizontalPattern and m_horizontalPattern.getPatternType() == PrefebPatterns.PT_FOUR and m_horizontalPattern.getKeyItem() == this)
+        {
+            m_nextInnerType = GEM_INNER_TYPE_HORIZONTAL
+        }
+        else if(m_verticalPattern and m_horizontalPattern)
+        {
+            m_nextInnerType = GEM_INNER_TYPE_BLOCK
+        }
+        else
+        {
         }
     }
 
@@ -151,7 +185,7 @@ class Item extends MovieClip {
         var gridPos = String(getGridX()) + getGridY()
         body["GridPos"].text = gridPos
         body["GridPos"]._visible = false    //zsj enable show gridIndex
-        if(m_currentStatus == GEM_STATUS_SWAPING || m_currentStatus == GEM_STATUS_DESTROY  )
+        if(m_currentStatus == GEM_STATUS_SWAPING || m_currentStatus == GEM_STATUS_DESTROY || m_currentStatus == GEM_STATUS_REBORN )
         {
             return;
         }
@@ -251,16 +285,60 @@ class Item extends MovieClip {
         m_gemBuilder.removeItem(this)
     }
 
+    public function onRebornAnimOver()
+    {
+        trace("onRebornAnimOver")
+        m_gemBuilder.unlockSwap()
+        m_currentStatus = GEM_STATUS_IDLE
+        m_tag = TAG_NONE
+        m_currentInnerType  = GEM_INNER_TYPE_NORMAL
+        m_nextInnerType     = GEM_INNER_TYPE_NORMAL
+        m_verticalPattern   = null
+        m_horizontalPattern = null
+    }
+
     public function playAnim(anim:String)
     {
         gotoAndPlay(anim)
     }
 
+    public function fire()
+    {
+        if(m_currentStatus == GEM_STATUS_REBORN)
+        {
+            return
+        }
+
+        if(m_nextInnerType == GEM_INNER_TYPE_NORMAL)
+        {
+            setDestroy(Item.DESTROY_TYPE_NORMAL)
+        }
+        else
+        {
+            var body = this["Body"];
+            var colorForm = body["ColorForm"]
+            var innerType = colorForm["InnerType"]
+            innerType.gotoAndStop(m_nextInnerType)
+            m_currentInnerType = m_nextInnerType
+            m_nextInnerType = GEM_INNER_TYPE_NORMAL
+            m_currentStatus = GEM_STATUS_REBORN
+            playAnim("reborn")
+        }
+    }
+
     public function setDestroy(destroyType)
     {
-        playAnim("destroy")
-        setStatus(GEM_STATUS_DESTROY)
-        m_gemBuilder.lockSwap()
+        if(m_currentStatus == GEM_STATUS_REBORN)
+        {
+            return
+        }
+
+        if(m_currentInnerType == GEM_INNER_TYPE_NORMAL)
+        {
+            playAnim("destroy")
+            setStatus(GEM_STATUS_DESTROY)
+            m_gemBuilder.lockSwap()
+        }
     }
 
     public function canBeUsedInPattern(layoutType:Number)
@@ -282,5 +360,10 @@ class Item extends MovieClip {
     public function canSwap()
     {
         return m_currentStatus == GEM_STATUS_IDLE and not m_gemBuilder.isLockedForSwap() and not m_verticalPattern and not m_horizontalPattern
+    }
+
+    public function canFire()
+    {
+        return m_currentStatus == GEM_STATUS_IDLE or m_currentStatus == GEM_STATUS_REBORN
     }
 }
