@@ -41,7 +41,10 @@ class GemBuilder {
     {
 //        trace("unlockSwap " + m_builderName)
         m_lockCounter--;
-//        trace("lockCounter " + m_lockCounter)
+        if(m_lockCounter < 0)
+        {
+            trace("Error: lockCounter " + m_lockCounter)
+        }
     }
 
     public function isLockedForSwap()
