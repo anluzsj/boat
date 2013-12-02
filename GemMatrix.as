@@ -66,15 +66,20 @@ class GemMatrix{
 //        trace("itemPos "+ m_firstItem.getGridX() + "  " + m_firstItem.getGridY())
     }
 
-    public function handlePanelRelease()
+    public function resetSwapItems()
     {
-        m_isPressed = false
         m_firstItemGridX = -1;
         m_firstItemGridY = -1;
         m_firstItem = null
         m_secondItemGridX = -1;
         m_secondItemGridY = -1;
         m_secondItem = null
+    }
+
+    public function handlePanelRelease()
+    {
+        m_isPressed = false
+        resetSwapItems()
     }
 
     public function getGemBuilder(gridX)
@@ -188,6 +193,12 @@ class GemMatrix{
         for(var i=0; i<gemBuilderLen; ++i)
         {
             m_gemBuilderList[i].update(dt)
+        }
+
+        if(m_firstItem and not m_firstItem.canSwap())
+        {
+            resetSwapItems()
+            m_isPressed = false
         }
 
         if(m_isPressed)
