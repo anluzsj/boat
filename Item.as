@@ -317,7 +317,6 @@ class Item extends MovieClip {
     public function onRebornAnimOver()
     {
         trace("onRebornAnimOver")
-        m_gemBuilder.unlockSwap()
         m_currentStatus = GEM_STATUS_IDLE
         m_tag = TAG_NONE
         m_currentInnerType  = GEM_INNER_TYPE_NORMAL
@@ -384,7 +383,6 @@ class Item extends MovieClip {
 
     public function canFire()
     {
-        //return m_currentStatus == GEM_STATUS_IDLE or m_currentStatus == GEM_STATUS_REBORN
         return m_currentStatus == GEM_STATUS_IDLE
     }
 }
