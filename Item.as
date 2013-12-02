@@ -103,6 +103,8 @@ class Item extends MovieClip {
         }
         else if(m_verticalPattern and m_horizontalPattern)
         {
+            m_verticalPattern.combineWith(m_horizontalPattern)
+            m_horizontalPattern.combineWith(m_verticalPattern)
             m_nextInnerType = GEM_INNER_TYPE_BLOCK
         }
         else if(m_verticalPattern and m_verticalPattern.getPatternType() == PrefebPatterns.PT_FOUR and m_verticalPattern.getKeyItem() == this)

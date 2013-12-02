@@ -13,7 +13,8 @@ class Patterns
     public var m_index;
     public var m_keyItem;
     public var m_fireCounter= -1;
-    static public var MAX_FIRE_DELAY_COUNT = 3
+    public var m_combinedPattern:Patterns = null
+    static public var MAX_FIRE_DELAY_COUNT = 5
     static public var LAYOUT_VERTICAL= 1
     static public var LAYOUT_HORIZONTAL= 2
     static public var TRIGGERED_BY_SWAP     = 1
@@ -59,6 +60,7 @@ class Patterns
         m_patternType = PrefebPatterns.PT_INVALID
         m_triggerType = TRIGGERED_BY_SWAP
         m_fireCounter = -1;
+        m_combinedPattern = null
     }
 
     public function setKeyItem(keyItem:Item)
@@ -161,6 +163,16 @@ class Patterns
         m_fireCounter = MAX_FIRE_DELAY_COUNT
     }
 
+    public function getFireCounter()
+    {
+        return m_fireCounter
+    }
+
+    public function combineWith(pattern:Patterns)
+    {
+        m_combinedPattern = pattern
+    }
+
     public function update(dt)
     {
         if(m_patternType == PrefebPatterns.PT_INVALID)
@@ -172,9 +184,14 @@ class Patterns
         {
             checkFire()
         }
-        else if(m_fireCounter == 0)
+        else if(m_fireCounter == 0 )
         {
-            fire()
+            if(not m_combinedPattern or m_combinedPattern.getFireCounter() == 0)
+            {
+                //caution,cannot swap order,since fire will call reset, which will set m_combinedPattern to null
+                m_combinedPattern.fire()
+                fire()
+            }
         }
         else
         {
