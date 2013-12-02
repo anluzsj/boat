@@ -9,7 +9,7 @@ class ItemBehavior
 
     static public function getItemPatternType(pattern:Patterns, itemBeenTest:Item, itemRef:Item)
     {
-        if(not itemBeenTest or not itemBeenTest.canBeUsedInPattern(pattern.getLayout()))
+        if(not itemBeenTest or not itemRef or not itemBeenTest.canBeUsedInPattern(pattern.getLayout()))
         {
             return NONE;
         }
