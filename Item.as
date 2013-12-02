@@ -60,11 +60,51 @@ class Item extends MovieClip {
         m_itemType = "none"
         m_verticalPattern = null;
         m_horizontalPattern = null;
+        var body = this["Body"];
+        var colorForm = body["ColorForm"]
+        var innerType = colorForm["InnerType"]
+        innerType.gotoAndStop(1)
+    }
+
+    public function showDebugInfo()
+    {
+        trace("---------------Item Info -----------------")
+        trace(this._name)
+        trace("gridX:" + m_gridX + ",  gridY:" + m_gridY)
+        trace("itemType " + m_itemType)
+        trace("currentInnerType " + m_currentInnerType)
+        trace("nextInnerType " + m_nextInnerType)
+        trace("currentStatus " + m_currentStatus)
+        trace("verticalPattern " + m_verticalPattern)
+        trace("horizontalPattern " + m_horizontalPattern)
     }
 
     public function isInVerticalPattern():Boolean
     {
         return m_verticalPattern != null;
+    }
+
+    public function checkNextInnerType()
+    {
+        if((m_verticalPattern and m_verticalPattern.getPatternType() == PrefebPatterns.PT_FIVE and m_verticalPattern.getKeyItem() == this) or (m_horizontalPattern and m_horizontalPattern.getPatternType() == PrefebPatterns.PT_FIVE and m_horizontalPattern.getKeyItem() == this))
+        {
+            m_nextInnerType = GEM_INNER_TYPE_SUPER
+        }
+        else if(m_verticalPattern and m_horizontalPattern)
+        {
+            m_nextInnerType = GEM_INNER_TYPE_BLOCK
+        }
+        else if(m_verticalPattern and m_verticalPattern.getPatternType() == PrefebPatterns.PT_FOUR and m_verticalPattern.getKeyItem() == this)
+        {
+            m_nextInnerType = GEM_INNER_TYPE_VERTICAL
+        }
+        else if(m_horizontalPattern and m_horizontalPattern.getPatternType() == PrefebPatterns.PT_FOUR and m_horizontalPattern.getKeyItem() == this)
+        {
+            m_nextInnerType = GEM_INNER_TYPE_HORIZONTAL
+        }
+        else
+        {
+        }
     }
 
     public function setInPattern(pattern)
@@ -77,26 +117,7 @@ class Item extends MovieClip {
         {
             m_horizontalPattern = pattern
         }
-
-        if((m_verticalPattern and m_verticalPattern.getPatternType() == PrefebPatterns.PT_FIVE and m_verticalPattern.getKeyItem() == this) or (m_horizontalPattern and m_horizontalPattern.getPatternType() == PrefebPatterns.PT_FIVE and m_horizontalPattern.getKeyItem() == this))
-        {
-            m_nextInnerType = GEM_INNER_TYPE_SUPER
-        }
-        else if(m_verticalPattern and m_verticalPattern.getPatternType() == PrefebPatterns.PT_FOUR and m_verticalPattern.getKeyItem() == this)
-        {
-            m_nextInnerType = GEM_INNER_TYPE_VERTICAL
-        }
-        else if(m_horizontalPattern and m_horizontalPattern.getPatternType() == PrefebPatterns.PT_FOUR and m_horizontalPattern.getKeyItem() == this)
-        {
-            m_nextInnerType = GEM_INNER_TYPE_HORIZONTAL
-        }
-        else if(m_verticalPattern and m_horizontalPattern)
-        {
-            m_nextInnerType = GEM_INNER_TYPE_BLOCK
-        }
-        else
-        {
-        }
+        checkNextInnerType()
     }
 
     public function isInHorizontalPattern():Boolean
@@ -285,6 +306,14 @@ class Item extends MovieClip {
         m_gemBuilder.removeItem(this)
     }
 
+    public function onRebornHalfAnimOver()
+    {
+        var body = this["Body"];
+        var colorForm = body["ColorForm"]
+        var innerType = colorForm["InnerType"]
+        innerType.gotoAndStop(m_currentInnerType)
+    }
+
     public function onRebornAnimOver()
     {
         trace("onRebornAnimOver")
@@ -304,21 +333,12 @@ class Item extends MovieClip {
 
     public function fire()
     {
-        if(m_currentStatus == GEM_STATUS_REBORN)
-        {
-            return
-        }
-
         if(m_nextInnerType == GEM_INNER_TYPE_NORMAL)
         {
             setDestroy(Item.DESTROY_TYPE_NORMAL)
         }
         else
         {
-            var body = this["Body"];
-            var colorForm = body["ColorForm"]
-            var innerType = colorForm["InnerType"]
-            innerType.gotoAndStop(m_nextInnerType)
             m_currentInnerType = m_nextInnerType
             m_nextInnerType = GEM_INNER_TYPE_NORMAL
             m_currentStatus = GEM_STATUS_REBORN
@@ -364,6 +384,7 @@ class Item extends MovieClip {
 
     public function canFire()
     {
-        return m_currentStatus == GEM_STATUS_IDLE or m_currentStatus == GEM_STATUS_REBORN
+        //return m_currentStatus == GEM_STATUS_IDLE or m_currentStatus == GEM_STATUS_REBORN
+        return m_currentStatus == GEM_STATUS_IDLE
     }
 }

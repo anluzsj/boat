@@ -21,26 +21,36 @@ class SwapHandle
         var item2HorizontalPattern  = PatternPool.getAPattern()
         if(item1.getGridX() == item2.getGridX() and Math.abs(item1.getGridY() - item2.getGridY()) == 1)
         {
-            item1VerticalPattern.constructPattern(Patterns.TRIGGERED_BY_SWAP, Patterns.LAYOUT_VERTICAL, item2.getGridX(), item2.getGridY(), null)
+            item1VerticalPattern.constructPattern(Patterns.TRIGGERED_BY_SWAP, Patterns.LAYOUT_VERTICAL, item2.getGridX(), item2.getGridY())
             item1VerticalPattern.swapItem(item1, item2)
-            item2VerticalPattern.constructPattern(Patterns.TRIGGERED_BY_SWAP,Patterns.LAYOUT_VERTICAL,item1.getGridX(), item1.getGridY(), null)
+            item2VerticalPattern.constructPattern(Patterns.TRIGGERED_BY_SWAP,Patterns.LAYOUT_VERTICAL,item1.getGridX(), item1.getGridY())
             item2VerticalPattern.swapItem(item1, item2)
-            item1HorizontalPattern.constructPattern(Patterns.TRIGGERED_BY_SWAP,Patterns.LAYOUT_HORIZONTAL,item2.getGridX(), item2.getGridY(), item1)
-            item2HorizontalPattern.constructPattern(Patterns.TRIGGERED_BY_SWAP,Patterns.LAYOUT_HORIZONTAL, item1.getGridX(), item1.getGridY(), item2)
+            item1HorizontalPattern.constructPattern(Patterns.TRIGGERED_BY_SWAP,Patterns.LAYOUT_HORIZONTAL,item2.getGridX(), item2.getGridY())
+            item1HorizontalPattern.setItemToIndex(item1, 2)
+            item2HorizontalPattern.constructPattern(Patterns.TRIGGERED_BY_SWAP,Patterns.LAYOUT_HORIZONTAL, item1.getGridX(), item1.getGridY())
+            item2HorizontalPattern.setItemToIndex(item2, 2)
         }
         else if(item1.getGridY() == item2.getGridY() and Math.abs(item1.getGridX() - item2.getGridX()) == 1)
         {
-            item1VerticalPattern.constructPattern(Patterns.TRIGGERED_BY_SWAP,Patterns.LAYOUT_VERTICAL, item2.getGridX(), item2.getGridY(), item1)
+            item1VerticalPattern.constructPattern(Patterns.TRIGGERED_BY_SWAP,Patterns.LAYOUT_VERTICAL, item2.getGridX(), item2.getGridY())
+            item1VerticalPattern.setItemToIndex(item1, 2)
             item2VerticalPattern.constructPattern(Patterns.TRIGGERED_BY_SWAP,Patterns.LAYOUT_VERTICAL, item1.getGridX(), item1.getGridY(), item2)
-            item1HorizontalPattern.constructPattern(Patterns.TRIGGERED_BY_SWAP,Patterns.LAYOUT_HORIZONTAL,item2.getGridX(), item2.getGridY(), null)
+            item2VerticalPattern.setItemToIndex(item2, 2)
+            item1HorizontalPattern.constructPattern(Patterns.TRIGGERED_BY_SWAP,Patterns.LAYOUT_HORIZONTAL,item2.getGridX(), item2.getGridY())
             item1HorizontalPattern.swapItem(item1, item2)
-            item2HorizontalPattern.constructPattern(Patterns.TRIGGERED_BY_SWAP,Patterns.LAYOUT_HORIZONTAL,item1.getGridX(), item1.getGridY(), null)
+            item2HorizontalPattern.constructPattern(Patterns.TRIGGERED_BY_SWAP,Patterns.LAYOUT_HORIZONTAL,item1.getGridX(), item1.getGridY())
             item2HorizontalPattern.swapItem(item1, item2)
         }
         else
         {
             trace("Error:Invalid move " + item1.getGridX() + " " + item1.getGridY() + "  " + item2.getGridX() + "  " + item2.getGridY())
         }
+
+        item1VerticalPattern.setKeyItem(item1)
+        item1HorizontalPattern.setKeyItem(item1)
+        item2VerticalPattern.setKeyItem(item2)
+        item2HorizontalPattern.setKeyItem(item2)
+
         item1VerticalPattern.checkIsValid()
         item1HorizontalPattern.checkIsValid()
         item2VerticalPattern.checkIsValid()

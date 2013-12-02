@@ -12,6 +12,8 @@ class Patterns
     public var m_triggerType;
     public var m_index;
     public var m_keyItem;
+    public var m_fireCounter= -1;
+    static public var MAX_FIRE_DELAY_COUNT = 3
     static public var LAYOUT_VERTICAL= 1
     static public var LAYOUT_HORIZONTAL= 2
     static public var TRIGGERED_BY_SWAP     = 1
@@ -56,6 +58,12 @@ class Patterns
 
         m_patternType = PrefebPatterns.PT_INVALID
         m_triggerType = TRIGGERED_BY_SWAP
+        m_fireCounter = -1;
+    }
+
+    public function setKeyItem(keyItem:Item)
+    {
+        m_keyItem = keyItem
     }
 
     public function getKeyItem()
@@ -151,8 +159,7 @@ class Patterns
                 return
             }
         }
-
-        fire()
+        m_fireCounter = MAX_FIRE_DELAY_COUNT
     }
 
     public function update(dt)
@@ -161,7 +168,20 @@ class Patterns
         {
             return
         }
-        checkFire()
+
+        if(m_fireCounter == -1)
+        {
+            checkFire()
+        }
+        else if(m_fireCounter == 0)
+        {
+            fire()
+        }
+        else
+        {
+            m_fireCounter -= 1
+            checkToAddNewItem()
+        }
     }
     public function getPatternValue()
     {
@@ -181,6 +201,89 @@ class Patterns
         trace("patterns: " + m_patterns[0] + " " + m_patterns[1] + " " + m_patterns[2] + "  " + m_patterns[3] + "  " + m_patterns[4] )
         trace("m_patternType " + m_patternType)
         trace("======================")
+    }
+
+    public function checkToAddNewItem()
+    {
+        if(m_patternType == PrefebPatterns.PT_INVALID or m_patternType == PrefebPatterns.PT_FIVE)
+        {
+            return
+        }
+
+        var firstItem   = m_items[0]
+        var lastItem    = null
+        var preFirstItem = null
+        var afterLastItem= null
+        if(m_patternType == PrefebPatterns.PT_THREE)
+        {
+            lastItem = m_items[2]
+        }
+        else if(m_patternType == PrefebPatterns.PT_FOUR)
+        {
+            lastItem = m_items[3]
+        }
+
+        var gemMatrix = PatternPool.getGemMatrix()
+        if(m_layoutType == Patterns.LAYOUT_VERTICAL)
+        {
+            preFirstItem = gemMatrix.getItem(firstItem.getGridX(), firstItem.getGridY() - 1)
+            afterLastItem= gemMatrix.getItem(lastItem.getGridX(), lastItem.getGridY() + 1)
+        }
+        else
+        {
+            preFirstItem = gemMatrix.getItem(firstItem.getGridX() - 1, firstItem.getGridY())
+            afterLastItem= gemMatrix.getItem(lastItem.getGridX() + 1, lastItem.getGridY())
+        }
+        if(ItemBehavior.getItemPatternType(this, preFirstItem, getKeyItem()) == ItemBehavior.SAME)
+        {
+            for(var i=5; i>0; --i)
+            {
+                m_items[i] = m_items[i-1]
+                m_patterns[i] = m_patterns[i-1]
+            }
+            m_items[0] = preFirstItem
+            m_patterns[0] = ItemBehavior.SAME
+            if(m_patternType == PrefebPatterns.PT_THREE)
+            {
+                m_patternType = PrefebPatterns.PT_FOUR
+            }
+            else if(m_patternType == PrefebPatterns.PT_FOUR)
+            {
+                m_patternType = PrefebPatterns.PT_FIVE
+            }
+            m_keyItem.checkNextInnerType()
+            preFirstItem.setInPattern(this)
+            m_fireCounter = -1
+            trace("find a preItem ")
+            showDebugInfo()
+            preFirstItem.showDebugInfo()
+        }
+        else if(ItemBehavior.getItemPatternType(this, afterLastItem, getKeyItem()) == ItemBehavior.SAME)
+        {
+            if(m_patternType == PrefebPatterns.PT_THREE)
+            {
+                m_items[3] = afterLastItem
+                m_patterns[3] = ItemBehavior.SAME
+                m_patternType = PrefebPatterns.PT_FOUR
+                afterLastItem.setInPattern(this)
+            }
+            else if(m_patternType == PrefebPatterns.PT_FOUR)
+            {
+                m_items[4] = afterLastItem
+                m_patterns[4] = ItemBehavior.SAME
+                m_patternType = PrefebPatterns.PT_FIVE
+                afterLastItem.setInPattern(this)
+            }
+            else
+            {
+                return
+            }
+            m_keyItem.checkNextInnerType()
+            m_fireCounter = -1
+            trace("find a afterItem ")
+            showDebugInfo()
+            afterLastItem.showDebugInfo()
+        }
     }
 
     public function checkIsValid()
@@ -212,17 +315,19 @@ class Patterns
         m_patterns[3] = ItemBehavior.getItemPatternType(this, m_items[3], m_items[2])
         m_patterns[4] = ItemBehavior.getItemPatternType(this, m_items[4], m_items[2])
         PrefebPatterns.checkPattern(this)
-        if(m_patternType != PrefebPatterns.PT_INVALID)
-        {
-            trace("find a valid pattern")
-            showDebugInfo()
-        }
+
+//        if(m_patternType != PrefebPatterns.PT_INVALID)
+//        {
+//            trace("find a valid pattern")
+//            showDebugInfo()
+//        }
     }
 
     static public function tryToFindAValidPattern(triggerType:Number, layoutType:Number, item:Item):Patterns
     {
         var pattern = PatternPool.getAPattern()
-        pattern.constructPattern(triggerType, layoutType, item.getGridX(), item.getGridY(), null)
+        pattern.constructPattern(triggerType, layoutType, item.getGridX(), item.getGridY())
+        pattern.setKeyItem(item)
         pattern.checkIsValid()
         if(pattern.isValid())
         {
@@ -234,7 +339,7 @@ class Patterns
         }
     }
 
-    public function constructPattern(triggerType:Number,layoutType:Number, centerGridX, centerGridY, centerItem:Item)
+    public function constructPattern(triggerType:Number,layoutType:Number, centerGridX, centerGridY)
     {
 //        trace("constructPattern " + centerGridX + "  " + centerGridY)
         var gemMatrix = PatternPool.getGemMatrix()
@@ -256,11 +361,11 @@ class Patterns
             m_items[3] = gemMatrix.getItem(centerGridX + 1, centerGridY)
             m_items[4] = gemMatrix.getItem(centerGridX + 2, centerGridY)
         }
-        if(centerItem)
-        {
-            m_items[2] = centerItem
-        }
-        m_keyItem = m_items[2]
+    }
+
+    public function setItemToIndex(item:Item, idx:Number)
+    {
+        m_items[idx] = item
     }
 
     public function swapItem(item1:Item, item2:Item)
