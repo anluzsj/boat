@@ -94,8 +94,8 @@ class Patterns
 
     public function fire()
     {
-        trace("Patterns.fire")
-        showDebugInfo()
+//        trace("Patterns.fire")
+//        showDebugInfo()
         var len = m_items.length
         for(var i=0; i<len ; ++i)
         {
@@ -254,9 +254,6 @@ class Patterns
             m_keyItem.checkNextInnerType()
             preFirstItem.setInPattern(this)
             m_fireCounter = -1
-            trace("find a preItem ")
-            showDebugInfo()
-            preFirstItem.showDebugInfo()
         }
         else if(ItemBehavior.getItemPatternType(this, afterLastItem, getKeyItem()) == ItemBehavior.SAME)
         {
@@ -280,9 +277,6 @@ class Patterns
             }
             m_keyItem.checkNextInnerType()
             m_fireCounter = -1
-            trace("find a afterItem ")
-            showDebugInfo()
-            afterLastItem.showDebugInfo()
         }
     }
 
