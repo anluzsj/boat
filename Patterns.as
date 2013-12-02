@@ -115,7 +115,6 @@ class Patterns
             return
         }
 
-        trace("setPatternType " + patternType)
         m_patternType = patternType
         if(m_patternType != PrefebPatterns.PT_INVALID)
         {
