@@ -62,12 +62,17 @@ class GemMatrix{
         }
         m_isPressed = true
         m_firstItem = getItem(m_firstItemGridX, m_firstItemGridY)
+        m_firstItem.setIsSelected(true)
 //        trace("handlePanelPress " + m_firstItem  + m_firstItemGridX + "  " + m_firstItemGridY)
 //        trace("itemPos "+ m_firstItem.getGridX() + "  " + m_firstItem.getGridY())
     }
 
     public function resetSwapItems()
     {
+        if(m_firstItem)
+        {
+            m_firstItem.setIsSelected(false)
+        }
         m_firstItemGridX = -1;
         m_firstItemGridY = -1;
         m_firstItem = null
@@ -211,6 +216,8 @@ class GemMatrix{
             {
                 m_secondItemGridX = -1;
                 m_secondItemGridY = -1;
+                resetSwapItems()
+                m_isPressed = false
                 return;
             }
             if((m_firstItemGridX != m_secondItemGridX and m_firstItemGridY == m_secondItemGridY) or (m_firstItemGridX == m_secondItemGridX and m_firstItemGridY != m_secondItemGridY) )

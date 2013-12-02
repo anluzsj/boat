@@ -19,6 +19,7 @@ class Item extends MovieClip {
     public var m_gemBuilder:GemBuilder;
     public var m_tag;
     public var m_gemMatrix:GemMatrix    = null;
+    public var m_isSelected:Boolean     = false;
     static public var TAG_NONE          = 0;
     static public var TAG_HIGHEST_DEPTH = 1;
 
@@ -48,6 +49,10 @@ class Item extends MovieClip {
 
     public function reset()
     {
+        if(m_isSelected)
+        {
+            m_gemMatrix.resetSwapItems()
+        }
         m_tag = TAG_NONE
         m_currentInnerType  = GEM_INNER_TYPE_NORMAL
         m_nextInnerType     = GEM_INNER_TYPE_NORMAL
@@ -55,6 +60,7 @@ class Item extends MovieClip {
         m_frameCounter = 0
         m_gridX = -1
         m_gridY = -1
+        m_isSelected = false
         this._x = 0
         this._y = 0
         m_itemType = "none"
@@ -64,6 +70,11 @@ class Item extends MovieClip {
         var colorForm = body["ColorForm"]
         var innerType = colorForm["InnerType"]
         innerType.gotoAndStop(1)
+    }
+
+    public function setIsSelected(isSelected:Boolean)
+    {
+        m_isSelected = isSelected
     }
 
     public function showDebugInfo()
@@ -316,7 +327,6 @@ class Item extends MovieClip {
 
     public function onRebornAnimOver()
     {
-        trace("onRebornAnimOver")
         m_currentStatus = GEM_STATUS_IDLE
         m_tag = TAG_NONE
         m_currentInnerType  = GEM_INNER_TYPE_NORMAL
@@ -378,7 +388,7 @@ class Item extends MovieClip {
 
     public function canSwap()
     {
-        return m_currentStatus == GEM_STATUS_IDLE and not m_gemBuilder.isLockedForSwap() and not m_verticalPattern and not m_horizontalPattern
+        return m_currentStatus == GEM_STATUS_IDLE and not m_gemBuilder.isLockedForSwap() and not m_verticalPattern and not m_horizontalPattern and this._visible
     }
 
     public function canFire()
