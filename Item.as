@@ -311,6 +311,7 @@ class Item extends MovieClip {
     public function onRollAnimOver()
     {
         m_currentStatus = GEM_STATUS_IDLE
+        checkNeedFalling()
     }
 
     public function onDestroyAnimOver()
@@ -330,6 +331,7 @@ class Item extends MovieClip {
     public function onRebornAnimOver()
     {
         m_currentStatus = GEM_STATUS_IDLE
+        checkNeedFalling()
         m_tag = TAG_NONE
         m_currentInnerType  = GEM_INNER_TYPE_NORMAL
         m_nextInnerType     = GEM_INNER_TYPE_NORMAL
