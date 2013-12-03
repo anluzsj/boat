@@ -184,9 +184,8 @@ class Item extends MovieClip {
 
     public function checkNeedFalling()
     {
-
         //we should check when GEM_STATUS_FALLING, so the drop anim is not smooth
-        if(m_currentStatus == GEM_STATUS_IDLE )
+        if(m_currentStatus == GEM_STATUS_IDLE and not m_verticalPattern and not m_horizontalPattern)
         {
             if(not m_gemBuilder.isItemReachButtom(this))
             {
